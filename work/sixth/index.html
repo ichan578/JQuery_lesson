@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,6 +10,7 @@
   <link rel="stylesheet" href="./css/style.css">
   <title>Document</title>
 </head>
+
 <body>
   <div class="wrapper" id="wrapper">
     <button type="button" class="btn search-btn" id="pokemon_search">ポケモンを探す</button>
@@ -16,6 +18,95 @@
   <script src="../../common/js/jquery.js"></script>
   <script>
     // 回答はここに書いてね
+    $(document).ready(function () {
+
+      // ポケモンを探すボタン押下
+      $(document).on('click', '#pokemon_search', function () {
+        // ランダム数値
+        let num = Math.floor(Math.random() * 151 - 1) + 1;
+
+        // ポケモン情報取得
+        $.ajax({
+          url: 'https://pokeapi.co/api/v2/pokemon/' + num,
+          method: 'GET'
+        }).done(function (pokemonData) {
+
+          // ポケモンの詳細取得
+          $.ajax({
+            url: pokemonData.species.url,
+            method: 'GET'
+          }).done(function (detailData) {
+
+            // 「ポケモンを探す」後の画面表示
+            let encountHtml =
+            `
+              <p class="name">${detailData.names[9].name}</p>
+              <div>
+                <img class="img" src="${pokemonData.sprites.front_default}" alt="">
+              </div>
+              <div>
+                <button class="btn" id="catch">捕まえる</button>
+                <button class="btn" data-js="reset">逃げる</button>
+              </div>
+            `
+            $('#wrapper').html(encountHtml);
+
+          }).fail(function (err) {
+            console.log('ポケモンの詳細取得に失敗しました。');
+          });
+
+        }).fail(function (err) {
+          console.log('ポケモン情報取得に失敗しました。');
+        });
+      });
+
+      // 捕まえるボタン押下
+      $(document).on('click', '#catch', function () {
+
+        // 捕獲成功判定（確率は50％）
+        const catchSuccess = Math.random() < 0.5;
+
+        // 捕獲成功時のif文
+        if (catchSuccess) {
+
+          // モンスターボールの取得
+          $.ajax({
+            url: 'https://pokeapi.co/api/v2/item/4',
+            method: 'GET'
+          }).done(function (ballData) {
+
+            // 「捕まえる」成功時の画面表示
+            let doneHtml =
+            `
+              <p class="name">ゲットしました</p>
+              <div>
+                <img class="img" src="${ballData.sprites.default}" alt="">
+              </div>
+              <button class="btn" data-js="reset">戻る</button>
+            `
+            $('#wrapper').html(doneHtml);
+
+          }).fail(function (err) {
+            console.log('モンスターボールの取得に失敗しました。');
+          });
+
+          // 捕獲失敗時の表示
+        } else {
+          let failHtml =
+          `
+            <p class="text">逃げられてしまった...</p>
+            <button class="btn mt" data-js="reset">戻る</button>
+          `
+          $('#wrapper').html(failHtml);
+        }
+      });
+
+      // 逃げる、戻るボタン押下
+      $(document).on('click', '[data-js="reset"]', function () {
+        $('#wrapper').html('<button type="button" class="btn search-btn" id="pokemon_search">ポケモンを探す</button>');
+      });
+    });
   </script>
 </body>
+
 </html>
