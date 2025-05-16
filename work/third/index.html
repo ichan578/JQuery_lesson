@@ -30,10 +30,12 @@
       // .eq() 引数に応じたindexの要素を指定します。
       // .addClass() クラスを追加します。
       // .removeClass() クラスを削除します。
-      $('.wrapper li').click(function(){
-        const index = $(this).index(); 
-        $('.contents li').hide();
-        $('.contents li').eq(index).show();
+      $(document).ready(function () {
+        $('.wrapper li').click(function(){
+          const index = $(this).index(); 
+          $('.contents li').hide();
+          $('.contents li').eq(index).show();
+        });
       });
     </script>
   </body>
